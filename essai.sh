@@ -6,13 +6,19 @@ install_packet_manager () {
     cd yay
     makepkg -si
 }
+install_oh_my_zsh () {
+    echo "Setting up zsh..."
+    yay -S --noconfirm zsh
+    chsh -s /bin/zsh
+}
 
 install_dev_dependencies () {
-    yay -Sy --noconfirm slack code npm
+    yay -Sy --noconfirm slack code npm git-cola
+    pip install pytest
 }
 
 install_vroomly_dependencies () {
-    yay -Sy --noconfirm nodejs-lts-fermium lib32-libjpeg-turbo zlib libwebp postgresql imagemagick libwebp libmemcached python-pip python-setuptools python-wheel python-cffi cairomm pango gdk-pixbuf2 libffi shared-mime-info gdal ansible redis yarn git-lfs poetry
+    yay -Sy --noconfirm nodejs-lts-fermium lib32-libjpeg-turbo zlib libwebp postgresql imagemagick libwebp memcached python-pip python-setuptools python-wheel python-cffi cairomm pango gdk-pixbuf2 libffi shared-mime-info gdal ansible redis yarn git-lfs poetry
 }
 generate_ssh_key () {
     ssh-keygen -t ed25519 -C devmartinjordan@gmail.com
@@ -63,8 +69,27 @@ setup_env_file_docauto () {
     cd docauto
     cp .env.template .env
 }
+poetry_genjs_npm_collectstatic_install () {
+    cd docauto
+    source .venv/bin/activate
+    poetry install
+    python manage.py genjs
+    yarn
+    python manage.py collectstatic --noinput
+    yarn build
+    python manage.py collectstatic --noinput
+}
+
+install_redis () {
+    sudo systemctl restart redis.service
+}
+install_mailhog () {
+    echo "setting up MailHog"
+    get "https://github.com/mailhog/MailHog/releases/download/v1.0.1/MailHog_linux_amd64"
+}
 
 #install_packet_manager
+install_oh_my_zsh
 #install_dev_dependencies
 #install_vroomly_dependencies
 #test_exist_key
@@ -73,4 +98,7 @@ setup_env_file_docauto () {
 #create_docauto_database
 #install_poetry
 #setup_virtualenv
-setup_env_file_docauto
+#setup_env_file_docauto
+#poetry_genjs_npm_collectstatic_install
+#install_redis
+#install_mailhog
